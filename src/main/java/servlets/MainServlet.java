@@ -1,25 +1,32 @@
 package servlets;
 
 import com.google.gson.Gson;
-import models.Coordinates;
+import models.*;
 import repository.implementation.CrudRepositoryImplementation;
+import validation.EntityValidator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        resp.getWriter().write("HELLO FROM SERVLET!");
-        CrudRepositoryImplementation<Coordinates> repository = new CrudRepositoryImplementation<>(Coordinates.class);
-
-        String locationId = req.getParameter("id");
-
-        sendAsJson(resp, repository.findById(Integer.parseInt(locationId)).get());
+        CrudRepositoryImplementation<HumanBeing> repository = new CrudRepositoryImplementation<>(HumanBeing.class);
+//        Car car = new Car("Молния", Boolean.TRUE);
+//        Coordinates coordinates = new Coordinates(200,3L);
+//        EntityValidator entityValidator = new EntityValidator();
+//        HumanBeing humanBeing = new HumanBeing("PFF", coordinates, Boolean.FALSE, true, Float.parseFloat("35.5"),
+//                "Belupacito", WeaponType.AXE, Mood.CALM, car);
+//        entityValidator.validateHumanBeing(humanBeing);
+//        repository.save(humanBeing);
+//        String locationId = req.getParameter("id");
+//
+//        sendAsJson(resp, repository.findById(Integer.parseInt(locationId)).get());
     }
 
     private void sendAsJson(HttpServletResponse response, Object obj) throws IOException {

@@ -8,7 +8,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-@Data
 @Entity
 @Table(name = "car")
 @Setter
@@ -23,4 +22,9 @@ public class Car {
 
     @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
     private List<HumanBeing> humanBeings;
+
+    public Car(String name, Boolean cool){
+        this.name = name;
+        this.cool = cool;
+    }
 }

@@ -7,6 +7,7 @@ import util.HibernateUtil;
 import util.HibernateUtil;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -16,10 +17,14 @@ import java.util.Optional;
 public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     private final SessionFactory sessionFactory;
     private final Class<T> tClass;
+    private Session session;
+    private EntityManager em;
 
     public CrudRepositoryImplementation(Class<T> tClass) {
         this.sessionFactory = HibernateUtil.getSessionFactory();
         this.tClass = tClass;
+        this.session = HibernateUtil.getSessionFactory().openSession();
+        this.em = session.getEntityManagerFactory().createEntityManager();
     }
 
     @Override
@@ -37,6 +42,15 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
         query.select(root);
         query.where(cb.equal(root.get("id"), id));
         return Optional.ofNullable(em.createQuery(query).getSingleResult());
+    }
+
+    public List<T> findAll() {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(tClass);
+        Root<T> from = criteriaQuery.from(tClass);
+        CriteriaQuery<T> select = criteriaQuery.select(from);
+        TypedQuery<T> typedQuery = em.createQuery(select);
+        return typedQuery.getResultList();
     }
 
     @Override

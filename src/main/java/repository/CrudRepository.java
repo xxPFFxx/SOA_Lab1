@@ -19,6 +19,8 @@ public interface CrudRepository<T> {
 
     void deleteById(Integer id);
 
+
+
     EntityManager createEntityManager();
 
     Session openSession();
