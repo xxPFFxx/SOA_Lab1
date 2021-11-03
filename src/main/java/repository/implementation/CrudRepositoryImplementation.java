@@ -57,7 +57,7 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     public T update(T entry) {
         EntityManager em = sessionFactory.createEntityManager();
         em.getTransaction().begin();
-        em.persist(entry);
+        em.merge(entry);
         em.flush();
         em.getTransaction().commit();
         return entry;

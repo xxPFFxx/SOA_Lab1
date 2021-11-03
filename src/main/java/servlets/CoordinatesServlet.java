@@ -7,7 +7,6 @@ import dto.dtoList.CoordinatesDTOList;
 import exceptions.EntityIsNotValidException;
 import mapper.CoordinatesMapper;
 import models.Coordinates;
-import models.HumanBeing;
 import repository.implementation.CrudRepositoryImplementation;
 import validation.EntityValidator;
 
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet("/coordinates/*")
 public class CoordinatesServlet extends HttpServlet {
@@ -63,11 +63,27 @@ public class CoordinatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //TODO Реализовать логику POST-запроса
+        String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        CoordinatesDTOList coordinatesDTOList = gson.fromJson(requestBody, CoordinatesDTOList.class);
+        Coordinates coordinatesToPersist = coordinatesMapper.mapCoordinatesDTOToCoordinates(coordinatesDTOList.getCoordinatesList().get(0));
+        entityValidator.validateCoordinates(coordinatesToPersist);
+        repository.save(coordinatesToPersist);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //TODO Реализовать логику PUT-запроса
+        String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        CoordinatesDTOList coordinatesDTOList = gson.fromJson(requestBody, CoordinatesDTOList.class);
+        Coordinates coordinatesToUpdate = coordinatesMapper.mapCoordinatesDTOToCoordinates(coordinatesDTOList.getCoordinatesList().get(0));
+        String pathInfo = request.getPathInfo();
+        String id = null;
+        if (pathInfo != null)
+            id = pathInfo.substring(1);
+
+        if (id != null) {
+            coordinatesToUpdate.setId(Long.parseLong(id));
+            entityValidator.validateCoordinates(coordinatesToUpdate);
+            repository.update(coordinatesToUpdate);
+        }
     }
 }
