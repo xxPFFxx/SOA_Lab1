@@ -3,12 +3,14 @@ package servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.HumanBeingDTO;
+import dto.PagedHumanBeingList;
 import dto.dtoList.HumanBeingDTOList;
 import exceptions.EntityIsNotValidException;
 import mapper.CoordinatesMapper;
 import mapper.HumanBeingMapper;
 import models.HumanBeing;
 import repository.implementation.CrudRepositoryImplementation;
+import util.UrlParametersUtil;
 import validation.EntityValidator;
 
 import javax.servlet.ServletException;
@@ -39,6 +41,12 @@ public class HumanBeingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String perPage = UrlParametersUtil.getField(request, "pageSize");
+        String curPage = UrlParametersUtil.getField(request, "pageNumber");
+        String sortBy = UrlParametersUtil.getField(request, "orderBy");
+        String filterBy = UrlParametersUtil.getField(request, "filterBy");
+
         String pathInfo = request.getPathInfo();
         String id = null;
         if (pathInfo != null)
@@ -47,7 +55,7 @@ public class HumanBeingServlet extends HttpServlet {
         if (id != null) {
             String finalId = id;
             HumanBeing humanBeing = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new EntityIsNotValidException("humanBeing with id = " + finalId + " does not exist"));
-            HumanBeingDTOList dto = new HumanBeingDTOList(new ArrayList<>());
+            HumanBeingDTOList dto = new HumanBeingDTOList(new ArrayList<>(), 1);
             List<HumanBeingDTO> dtoList = new ArrayList<>();
             dtoList.add(humanBeingMapper.mapHumanBeingToHumanBeingDTO(humanBeing));
             dto.setHumanBeingList(dtoList);
@@ -55,11 +63,14 @@ public class HumanBeingServlet extends HttpServlet {
             return;
         }
 
-        List<HumanBeing> humanBeing = repository.findAll();
+//        List<HumanBeing> humanBeing = repository.findAll();
+//
+//        HumanBeingDTOList dto = new HumanBeingDTOList(new ArrayList<>());
+//        dto.setHumanBeingList(humanBeingMapper.mapHumanBeingListToHumanBeingDTOList(humanBeing));
 
-        HumanBeingDTOList dto = new HumanBeingDTOList(new ArrayList<>());
-        dto.setHumanBeingList(humanBeingMapper.mapHumanBeingListToHumanBeingDTOList(humanBeing));
-
+        PagedHumanBeingList pagedHumanBeingList = repository.findAll(perPage, curPage, sortBy, filterBy);
+        HumanBeingDTOList dto = new HumanBeingDTOList((humanBeingMapper.mapHumanBeingListToHumanBeingDTOList(pagedHumanBeingList.getHumanBeingList())), pagedHumanBeingList.getCount());
+        response.addHeader("Access-Control-Allow-Origin", "*");
         response.getWriter().write(gson.toJson(dto));
     }
 
@@ -68,9 +79,10 @@ public class HumanBeingServlet extends HttpServlet {
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
         HumanBeing humanBeingToPersist = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
-        humanBeingToPersist.setCreationDate(LocalDateTime.now());
+        humanBeingToPersist.setCreationDate(LocalDateTime.now()); // TODO Не устанавливается дата создания в БД почему-то
         entityValidator.validateHumanBeing(humanBeingToPersist);
         repository.save(humanBeingToPersist);
+        response.addHeader("Access-Control-Allow-Origin", "*");
     }
 
     @Override
@@ -88,5 +100,6 @@ public class HumanBeingServlet extends HttpServlet {
             humanBeingToUpdate.setId(Long.parseLong(id));
             repository.update(humanBeingToUpdate);
         }
+        response.addHeader("Access-Control-Allow-Origin", "*");
     }
 }

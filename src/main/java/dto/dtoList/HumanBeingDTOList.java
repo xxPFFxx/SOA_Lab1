@@ -15,4 +15,5 @@ import java.util.List;
 @NoArgsConstructor
 public class HumanBeingDTOList {
     private List<HumanBeingDTO> humanBeingList;
+    private long count;
 }
