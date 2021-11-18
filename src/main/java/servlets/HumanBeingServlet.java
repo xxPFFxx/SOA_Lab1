@@ -76,17 +76,18 @@ public class HumanBeingServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        cors(response);
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
         HumanBeing humanBeingToPersist = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
         humanBeingToPersist.setCreationDate(LocalDateTime.now()); // TODO Не устанавливается дата создания в БД почему-то
         entityValidator.validateHumanBeing(humanBeingToPersist);
         repository.save(humanBeingToPersist);
-        response.addHeader("Access-Control-Allow-Origin", "*");
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        cors(response);
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
         HumanBeing humanBeingToUpdate = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
@@ -100,6 +101,31 @@ public class HumanBeingServlet extends HttpServlet {
             humanBeingToUpdate.setId(Long.parseLong(id));
             repository.update(humanBeingToUpdate);
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        cors(response);
+        String pathInfo = request.getPathInfo();
+        System.out.println(pathInfo);
+        String humanBeingId = null;
+        if (pathInfo != null)
+            humanBeingId = pathInfo.substring(1);
+        System.out.println(humanBeingId);
+        String finalHumanBeingId = humanBeingId;
+        HumanBeing humanBeing = (repository.findById(Integer.parseInt(humanBeingId))).orElseThrow(() -> new EntityIsNotValidException("humanBeing with id = " + finalHumanBeingId + " does not exist"));
+        repository.deleteById(Integer.parseInt(humanBeingId));
+
+    }
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        cors(response);
+    }
+
+    protected void cors(HttpServletResponse response){
         response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.addHeader("Access-Control-Allow-Credentials", "true");
     }
 }

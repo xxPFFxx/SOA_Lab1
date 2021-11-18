@@ -39,13 +39,11 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     @Override
     public List<T> findByCriteria(CriteriaQuery<T> criteriaQuery) {
-        EntityManager em = sessionFactory.createEntityManager();
         return em.createQuery(criteriaQuery).getResultList();
     }
 
     @Override
     public Optional<T> findById(Integer id) {
-        EntityManager em = sessionFactory.createEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<T> query = cb.createQuery(tClass);
         Root<T> root = query.from(tClass);
@@ -278,7 +276,6 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     @Override
     public T update(T entry) {
-        EntityManager em = sessionFactory.createEntityManager();
         em.getTransaction().begin();
         em.merge(entry);
         em.flush();
@@ -288,7 +285,6 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     @Override
     public void save(T entry) {
-        EntityManager em = sessionFactory.createEntityManager();
         em.getTransaction().begin();
         em.persist(entry);
         em.getTransaction().commit();
@@ -296,9 +292,8 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     @Override
     public void deleteById(Integer id) {
-        EntityManager em = sessionFactory.createEntityManager();
         em.getTransaction().begin();
-        em.remove(this.findById(id));
+        em.remove(this.findById(id).get());
         em.getTransaction().commit();
     }
 
