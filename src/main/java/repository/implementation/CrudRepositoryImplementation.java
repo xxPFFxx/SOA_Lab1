@@ -15,6 +15,7 @@ import util.HibernateUtil;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -277,9 +278,13 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     @Override
     public T update(T entry) {
         em.getTransaction().begin();
-        em.merge(entry);
-        em.flush();
-        em.getTransaction().commit();
+        try {
+            em.merge(entry);
+            em.flush();
+            em.getTransaction().commit();
+        } catch (ConstraintViolationException e){
+            em.getTransaction().rollback();
+        }
         return entry;
     }
 
@@ -305,6 +310,10 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     @Override
     public Session openSession() {
         return sessionFactory.openSession();
+    }
+
+    public void clearEntityManager() {
+        em.clear();
     }
 
 }

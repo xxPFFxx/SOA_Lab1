@@ -72,6 +72,7 @@ public class HumanBeingServlet extends HttpServlet {
         HumanBeingDTOList dto = new HumanBeingDTOList((humanBeingMapper.mapHumanBeingListToHumanBeingDTOList(pagedHumanBeingList.getHumanBeingList())), pagedHumanBeingList.getCount());
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.getWriter().write(gson.toJson(dto));
+        repository.clearEntityManager();
     }
 
     @Override
@@ -107,11 +108,9 @@ public class HumanBeingServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cors(response);
         String pathInfo = request.getPathInfo();
-        System.out.println(pathInfo);
         String humanBeingId = null;
         if (pathInfo != null)
             humanBeingId = pathInfo.substring(1);
-        System.out.println(humanBeingId);
         String finalHumanBeingId = humanBeingId;
         HumanBeing humanBeing = (repository.findById(Integer.parseInt(humanBeingId))).orElseThrow(() -> new EntityIsNotValidException("humanBeing with id = " + finalHumanBeingId + " does not exist"));
         repository.deleteById(Integer.parseInt(humanBeingId));
