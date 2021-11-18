@@ -120,40 +120,95 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
         if (sortBy != null) {
             List<String> criteria = new ArrayList<>(Arrays.asList(sortBy.split(";")));
             for (String criterion : criteria) {
-
-                switch (criterion) {
+                boolean order = String.valueOf(criterion.charAt(0)).equals(" ");
+                switch (criterion.substring(1)) {
                     case ("id"):
-                        orderList.add(criteriaBuilder.asc(from.get("id")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("id")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("id")));
+                        }
                         break;
                     case ("name"):
-                        orderList.add(criteriaBuilder.asc(from.get("name")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("name")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("name")));
+                        }
                         break;
                     case ("realHero"):
-                        orderList.add(criteriaBuilder.asc(from.get("realHero")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("realHero")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("realHero")));
+                        }
                         break;
                     case ("hasToothpick"):
-                        orderList.add(criteriaBuilder.asc(from.get("hasToothpick")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("hasToothpick")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("hasToothpick")));
+                        }
                         break;
                     case ("impactSpeed"):
-                        orderList.add(criteriaBuilder.asc(from.get("impactSpeed")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("impactSpeed")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("impactSpeed")));
+                        }
                         break;
                     case ("soundtrackName"):
-                        orderList.add(criteriaBuilder.asc(from.get("soundtrackName")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("soundtrackName")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("soundtrackName")));
+                        }
                         break;
                     case ("date"):
-                        orderList.add(criteriaBuilder.asc(from.get("creationDate")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("date")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("date")));
+                        }
                         break;
-                    case ("coordinate"):
-                        orderList.add(criteriaBuilder.asc(from.get("coordinates").get("x")));
+                    case ("coordinates"):
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("coordinates").get("x")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("coordinates").get("x")));
+                        }
                         break;
                     case ("car"):
-                        orderList.add(criteriaBuilder.asc(from.get("car").get("name")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("car").get("name")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("car").get("name")));
+                        }
                         break;
                     case ("weaponType"):
-                        orderList.add(criteriaBuilder.asc(from.get("weaponType")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("weaponType")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("weaponType")));
+                        }
                         break;
                     case ("mood"):
-                        orderList.add(criteriaBuilder.asc(from.get("mood")));
+                        if (order){
+                            orderList.add(criteriaBuilder.asc(from.get("mood")));
+                        }
+                        else {
+                            orderList.add(criteriaBuilder.desc(from.get("mood")));
+                        }
                         break;
                 }
             }
