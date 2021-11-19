@@ -17,6 +17,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -169,12 +170,12 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
                             orderList.add(criteriaBuilder.desc(from.get("soundtrackName")));
                         }
                         break;
-                    case ("date"):
+                    case ("creationDate"):
                         if (order){
-                            orderList.add(criteriaBuilder.asc(from.get("date")));
+                            orderList.add(criteriaBuilder.asc(from.get("creationDate")));
                         }
                         else {
-                            orderList.add(criteriaBuilder.desc(from.get("date")));
+                            orderList.add(criteriaBuilder.desc(from.get("creationDate")));
                         }
                         break;
                     case ("coordinates"):
@@ -234,11 +235,19 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
                         Predicate y = criteriaBuilder.equal(from.get("coordinates").get("y"), Double.parseDouble(coordinates.get(1)));
                         predicates.add(criteriaBuilder.and(x, y));
                         break;
-                    case ("date"):
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/y");
-                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("creationDate"), LocalDate.parse(filter.get(1), formatter)));
-                        predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("creationDate"), LocalDate.parse(filter.get(2), formatter)));
-                        break; //TODO посмотреть, как с датами фильтровать
+                    case ("creationDate"):
+                        List<String> minutesFormat = new ArrayList<>(Arrays.asList(filter.get(2).split(",")));
+                        List<String> dateParameters = new ArrayList<>();
+                        dateParameters.add((filter.get(1) + ":" + minutesFormat.get(0)).replace("T", " "));
+                        dateParameters.add(minutesFormat.get(1));
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                        if (dateParameters.get(1).equals("after")){
+                            predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
+                        }
+                        if (dateParameters.get(1).equals("before")){
+                            predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
+                        }
+                        break;
                     case ("realHero"):
                         predicates.add(criteriaBuilder.equal(from.get("realHero"), Boolean.parseBoolean(filter.get(1))));
                         break;
