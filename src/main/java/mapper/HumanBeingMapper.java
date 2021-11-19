@@ -39,6 +39,7 @@ public class HumanBeingMapper {
         humanBeingDTO.setId(String.valueOf(humanBeing.getId()));
         humanBeingDTO.setName(String.valueOf(humanBeing.getName()));
         humanBeingDTO.setCoordinates(coordinatesMapper.mapCoordinatesToCoordinatesDTO(humanBeing.getCoordinates()));
+        humanBeingDTO.setCreationDate(String.valueOf(humanBeing.getCreationDate()));
         humanBeingDTO.setRealHero(String.valueOf(humanBeing.getRealHero()));
         humanBeingDTO.setHasToothpick(String.valueOf(humanBeing.getHasToothpick()));
         humanBeingDTO.setImpactSpeed(String.valueOf(humanBeing.getImpactSpeed()));

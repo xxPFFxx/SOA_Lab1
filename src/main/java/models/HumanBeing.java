@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
@@ -30,9 +31,8 @@ public class HumanBeing {
     @NotNull(message = "coordinates must be not Null value")
     private Coordinates coordinates; //Поле не может быть null
 
-    @Column(updatable = false, insertable = false)
     @CreationTimestamp
-    private java.time.LocalDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    private LocalDateTime creationDate;
 
     @NotNull(message = "realHero must be not Null value")
     private Boolean realHero; //Поле не может быть null

@@ -80,7 +80,8 @@ public class HumanBeingServlet extends HttpServlet {
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
         HumanBeing humanBeingToPersist = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
-        humanBeingToPersist.setCreationDate(LocalDateTime.now()); // TODO Не устанавливается дата создания в БД почему-то
+//        humanBeingToPersist.setCreationDate(LocalDateTime.now()); // TODO Не устанавливается дата создания в БД почему-то
+//        System.out.println(humanBeingToPersist.getCreationDate());
         entityValidator.validateHumanBeing(humanBeingToPersist);
         repository.save(humanBeingToPersist);
     }
