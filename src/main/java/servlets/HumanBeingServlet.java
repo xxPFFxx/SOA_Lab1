@@ -41,7 +41,7 @@ public class HumanBeingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        cors(response);
         String perPage = UrlParametersUtil.getField(request, "pageSize");
         String curPage = UrlParametersUtil.getField(request, "pageNumber");
         String sortBy = UrlParametersUtil.getField(request, "orderBy");
@@ -70,7 +70,6 @@ public class HumanBeingServlet extends HttpServlet {
 
         PagedHumanBeingList pagedHumanBeingList = repository.findAll(perPage, curPage, sortBy, filterBy);
         HumanBeingDTOList dto = new HumanBeingDTOList((humanBeingMapper.mapHumanBeingListToHumanBeingDTOList(pagedHumanBeingList.getHumanBeingList())), pagedHumanBeingList.getCount());
-        response.addHeader("Access-Control-Allow-Origin", "*");
         response.getWriter().write(gson.toJson(dto));
         repository.clearEntityManager();
     }

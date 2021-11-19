@@ -217,56 +217,48 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     private ArrayList<Predicate> getPredicatesList(String filterBy, CriteriaBuilder criteriaBuilder, Root<HumanBeing> from) {
         ArrayList<Predicate> predicates = new ArrayList<>();
-        if (filterBy != null) {
+        if (filterBy != null && !filterBy.isEmpty()) {
             List<String> notParsedFilters = new ArrayList<>(Arrays.asList(filterBy.split(";")));
             for (String filterString : notParsedFilters) {
-                List<String> filter = new ArrayList<>(Arrays.asList(filterString.split(",")));
+                List<String> filter = new ArrayList<>(Arrays.asList(filterString.split(":")));
                 switch (filter.get(0)) {
                     case ("id"):
-                        if (filter.size() < 3) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("id"), Integer.parseInt(filter.get(1))));
-                        predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("id"), Integer.parseInt(filter.get(2))));
+                        predicates.add(criteriaBuilder.equal(from.get("id"), Integer.parseInt(filter.get(1))));
                         break;
                     case ("name"):
-                        if (filter.size() < 2) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.like(criteriaBuilder.upper(from.get("name")),
-                                filter.get(1).toUpperCase() + "%"));
+                        predicates.add(criteriaBuilder.equal(from.get("name"), filter.get(1)));
                         break;
-                    case ("oscar"):
-                        if (filter.size() < 3) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("oscarsCount"), Integer.parseInt(filter.get(1))));
-                        predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("oscarsCount"), Integer.parseInt(filter.get(2))));
-                        break;
-                    case ("duration"):
-                        if (filter.size() < 3) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("duration"), Integer.parseInt(filter.get(1))));
-                        predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("duration"), Integer.parseInt(filter.get(2))));
-                        break;
-                    case ("weaponType"):
-                        if (filter.size() < 2) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.equal(from.get("weaponType"), WeaponType.valueOf(filter.get(1))));
-                        break;
-                    case ("mood"):
-                        if (filter.size() < 2) throw new EntityIsNotValidException("number of arguments less than required");
-                        predicates.add(criteriaBuilder.equal(from.get("mood"), Mood.valueOf(filter.get(1))));
+                    case ("coordinates"):
+                        List<String> coordinates = new ArrayList<>(Arrays.asList(filter.get(1).split(",")));
+                        Predicate x = criteriaBuilder.equal(from.get("coordinates").get("x"), Double.parseDouble(coordinates.get(0)));
+                        Predicate y = criteriaBuilder.equal(from.get("coordinates").get("y"), Double.parseDouble(coordinates.get(1)));
+                        predicates.add(criteriaBuilder.and(x, y));
                         break;
                     case ("date"):
-                        if (filter.size() < 3) throw new EntityIsNotValidException("number of arguments less than required");
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/y");
                         predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("creationDate"), LocalDate.parse(filter.get(1), formatter)));
                         predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("creationDate"), LocalDate.parse(filter.get(2), formatter)));
+                        break; //TODO посмотреть, как с датами фильтровать
+                    case ("realHero"):
+                        predicates.add(criteriaBuilder.equal(from.get("realHero"), Boolean.parseBoolean(filter.get(1))));
                         break;
-                    case ("coordinate"):
-                        if (filter.size() < 5) throw new EntityIsNotValidException("number of arguments less than required");
-                        Predicate x = criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(from.get("coordinates").get("x"), Double.parseDouble(filter.get(1))),
-                                criteriaBuilder.lessThanOrEqualTo(from.get("coordinates").get("x"), Double.parseDouble(filter.get(2))));
-                        Predicate y = criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(from.get("coordinates").get("y"), Double.parseDouble(filter.get(3))),
-                                criteriaBuilder.lessThanOrEqualTo(from.get("coordinates").get("y"), Double.parseDouble(filter.get(4))));
-                        predicates.add(criteriaBuilder.and(x, y));
+                    case ("hasToothpick"):
+                        predicates.add(criteriaBuilder.equal(from.get("hasToothpick"), Boolean.parseBoolean(filter.get(1))));
                         break;
-                    case ("screenWriter"):
-                        predicates.add(criteriaBuilder.like(criteriaBuilder.upper(from.get("screenWriter").get("name")),
-                                filter.get(1).toUpperCase() + "%"));
+                    case ("impactSpeed"):
+                        predicates.add(criteriaBuilder.equal(from.get("impactSpeed"), Float.parseFloat(filter.get(1))));
+                        break;
+                    case ("weaponType"):
+                        predicates.add(criteriaBuilder.equal(from.get("weaponType"), WeaponType.valueOf(filter.get(1))));
+                        break;
+                    case ("mood"):
+                        predicates.add(criteriaBuilder.equal(from.get("mood"), Mood.valueOf(filter.get(1))));
+                        break;
+                    case ("soundtrackName"):
+                        predicates.add(criteriaBuilder.equal(from.get("soundtrackName"), filter.get(1)));
+                        break;
+                    case ("car"):
+                        predicates.add(criteriaBuilder.equal(from.get("car").get("name"), filter.get(1)));
                         break;
                 }
             }
