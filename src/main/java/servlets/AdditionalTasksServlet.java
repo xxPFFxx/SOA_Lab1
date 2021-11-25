@@ -42,8 +42,10 @@ public class AdditionalTasksServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        cors(response);
         String weaponTypeCount = request.getParameter("weaponTypeCount");
         String weaponTypeArray = request.getParameter("weaponTypeArray");
+        String uniqueImpactSpeed = request.getParameter("uniqueImpactSpeed");
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
@@ -70,5 +72,18 @@ public class AdditionalTasksServlet extends HttpServlet {
             response.getWriter().write(gson.toJson(dto));
             return;
         }
+        if (uniqueImpactSpeed != null){
+            criteriaQuery.select(from.get("impactSpeed")).distinct(true);
+            List<HumanBeing> humanBeingList = em.createQuery(criteriaQuery).getResultList();
+            response.getWriter().write(gson.toJson(humanBeingList));
+        }
+
+    }
+
+    protected void cors(HttpServletResponse response){
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.addHeader("Access-Control-Allow-Credentials", "true");
     }
 }

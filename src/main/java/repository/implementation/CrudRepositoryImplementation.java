@@ -116,7 +116,6 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
 
     private List<Order> getOrderList(String sortBy, CriteriaBuilder criteriaBuilder, Root<HumanBeing> from) {
         List<Order> orderList = new ArrayList();
-        System.out.println(sortBy);
         if (sortBy != null) {
             List<String> criteria = new ArrayList<>(Arrays.asList(sortBy.split(";")));
             for (String criterion : criteria) {
