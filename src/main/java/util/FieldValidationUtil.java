@@ -1,10 +1,8 @@
 package util;
 
-import exceptions.EntityIsNotValidException;
+import exceptions.NotFoundException;
 import models.Mood;
 import models.WeaponType;
-
-import java.time.LocalDateTime;
 
 public class FieldValidationUtil {
 
@@ -70,7 +68,7 @@ public class FieldValidationUtil {
         try {
             return Mood.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new EntityIsNotValidException("Movie genre does not exist " + value);
+            throw new NotFoundException("Movie genre does not exist " + value);
         }
     }
 
@@ -80,7 +78,7 @@ public class FieldValidationUtil {
         try {
             return WeaponType.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new EntityIsNotValidException("Mpaa rating does not exist " + value);
+            throw new NotFoundException("Mpaa rating does not exist " + value);
         }
     }
 

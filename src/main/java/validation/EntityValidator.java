@@ -1,6 +1,7 @@
 package validation;
 
-import exceptions.EntityIsNotValidException;
+import exceptions.BadRequestException;
+import exceptions.NotFoundException;
 import models.Car;
 import models.Coordinates;
 import models.HumanBeing;
@@ -27,22 +28,22 @@ public class EntityValidator {
         return errorMessage;
     }
 
-    public void validateCar(Car car) throws EntityIsNotValidException {
+    public void validateCar(Car car) throws NotFoundException {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(car);
         if (!constraintViolations.isEmpty())
-            throw new EntityIsNotValidException(formExceptionMsg(constraintViolations));
+            throw new BadRequestException(formExceptionMsg(constraintViolations));
     }
 
-    public void validateCoordinates(Coordinates coordinates) throws EntityIsNotValidException {
+    public void validateCoordinates(Coordinates coordinates) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(coordinates);
         if (!constraintViolations.isEmpty())
-            throw new EntityIsNotValidException(formExceptionMsg(constraintViolations));
+            throw new BadRequestException(formExceptionMsg(constraintViolations));
     }
 
-    public void validateHumanBeing(HumanBeing humanBeing) throws EntityIsNotValidException {
+    public void validateHumanBeing(HumanBeing humanBeing) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(humanBeing);
         if (!constraintViolations.isEmpty())
-            throw new EntityIsNotValidException(formExceptionMsg(constraintViolations));
+            throw new BadRequestException(formExceptionMsg(constraintViolations));
     }
 
 

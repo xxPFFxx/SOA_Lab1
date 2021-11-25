@@ -1,8 +1,7 @@
 package repository.implementation;
 
 import dto.PagedHumanBeingList;
-import dto.dtoList.HumanBeingDTOList;
-import exceptions.EntityIsNotValidException;
+import exceptions.BadRequestException;
 import models.HumanBeing;
 import models.Mood;
 import models.WeaponType;
@@ -10,13 +9,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import repository.CrudRepository;
 import util.HibernateUtil;
-import util.HibernateUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import javax.validation.ConstraintViolationException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -88,15 +85,23 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     }
 
     private List<HumanBeing> findAll(String perPage, String curPage, CriteriaQuery<HumanBeing> select) {
-        if (perPage != null && curPage != null) {
-            int pageNumber = parseInteger(curPage);
-            int pageSize = parseInteger(perPage);
-            TypedQuery<HumanBeing> typedQuery = em.createQuery(select);
-            typedQuery.setFirstResult((pageNumber - 1) * pageSize);
-            typedQuery.setMaxResults(pageSize);
-            return typedQuery.getResultList();
-        } else
-            return findAll(select);
+        try {
+            if (perPage != null && curPage != null) {
+
+                int pageNumber = parseInteger(curPage);
+                int pageSize = parseInteger(perPage);
+                if (pageNumber <= 0) throw new BadRequestException("Bad format of pageNumber: " + pageNumber + ", should be natural number (1,2,...)");
+                if (pageSize < 0) throw new BadRequestException("Bad format of pageSize: " + pageSize + ", should be non-negative integer number (0,1,...)");
+                TypedQuery<HumanBeing> typedQuery = em.createQuery(select);
+                typedQuery.setFirstResult((pageNumber - 1) * pageSize);
+                typedQuery.setMaxResults(pageSize);
+                return typedQuery.getResultList();
+            } else
+                return findAll(select);
+        }catch (NumberFormatException e) {
+            throw new BadRequestException("Bad format of pageSize or pageNumber. They should be integer numbers (1,2,...)");
+        }
+
     }
 
     private List<HumanBeing> findAll(CriteriaQuery<HumanBeing> select) {

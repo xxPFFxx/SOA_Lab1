@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import dto.CountDTO;
 import dto.PagedHumanBeingList;
 import dto.dtoList.HumanBeingDTOList;
+import exceptions.BadRequestException;
+import exceptions.NotFoundException;
 import mapper.HumanBeingMapper;
 import models.HumanBeing;
 import models.WeaponType;
@@ -55,7 +57,12 @@ public class AdditionalTasksServlet extends HttpServlet {
         em.createQuery(countQuery);
 
         if (weaponTypeCount != null) {
-            countQuery.where(criteriaBuilder.greaterThan(from.get("weaponType"), WeaponType.valueOf(weaponTypeCount)));
+            try {
+                countQuery.where(criteriaBuilder.greaterThan(from.get("weaponType"), WeaponType.valueOf(weaponTypeArray)));
+            }catch (IllegalArgumentException e){
+                throw new BadRequestException("No such weaponType:" + weaponTypeArray);
+            }
+
             Long countResult = em.createQuery(countQuery).getSingleResult();
             CountDTO countDTO = new CountDTO();
             countDTO.setCount(countResult);
@@ -63,7 +70,12 @@ public class AdditionalTasksServlet extends HttpServlet {
             return;
         }
         if (weaponTypeArray != null) {
-            criteriaQuery.where(criteriaBuilder.greaterThan(from.get("weaponType"), WeaponType.valueOf(weaponTypeArray)));
+            try {
+                criteriaQuery.where(criteriaBuilder.greaterThan(from.get("weaponType"), WeaponType.valueOf(weaponTypeArray)));
+            }catch (IllegalArgumentException e){
+                throw new BadRequestException("No such weaponType:" + weaponTypeArray);
+            }
+
             List<HumanBeing> humanBeingList = em.createQuery(criteriaQuery).getResultList();
             PagedHumanBeingList pagedHumanBeingList = new PagedHumanBeingList();
             pagedHumanBeingList.setHumanBeingList(humanBeingList);

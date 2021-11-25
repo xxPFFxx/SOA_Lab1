@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.CarDTO;
 import dto.dtoList.CarDTOList;
-import exceptions.EntityIsNotValidException;
+import exceptions.NotFoundException;
 import mapper.CarMapper;
 import models.Car;
 import repository.implementation.CrudRepositoryImplementation;
@@ -44,7 +44,7 @@ public class CarServlet extends HttpServlet {
 
         if (id != null) {
             String finalId = id;
-            Car car = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new EntityIsNotValidException("car with id = " + finalId + " does not exist"));
+            Car car = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new NotFoundException("car with id = " + finalId + " does not exist"));
             CarDTOList dto = new CarDTOList(new ArrayList<>());
             List<CarDTO> dtoList = new ArrayList<>();
             dtoList.add(carMapper.mapCarToCarDTO(car));

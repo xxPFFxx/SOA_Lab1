@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.CoordinatesDTO;
 import dto.dtoList.CoordinatesDTOList;
-import exceptions.EntityIsNotValidException;
+import exceptions.NotFoundException;
 import mapper.CoordinatesMapper;
 import models.Coordinates;
 import repository.implementation.CrudRepositoryImplementation;
@@ -44,7 +44,7 @@ public class CoordinatesServlet extends HttpServlet {
 
         if (id != null) {
             String finalId = id;
-            Coordinates coordinates = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new EntityIsNotValidException("coordinates with id = " + finalId + " does not exist"));
+            Coordinates coordinates = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new NotFoundException("coordinates with id = " + finalId + " does not exist"));
             CoordinatesDTOList dto = new CoordinatesDTOList(new ArrayList<>());
             List<CoordinatesDTO> dtoList = new ArrayList<>();
             dtoList.add(coordinatesMapper.mapCoordinatesToCoordinatesDTO(coordinates));
