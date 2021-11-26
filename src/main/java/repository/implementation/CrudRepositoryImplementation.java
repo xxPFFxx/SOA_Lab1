@@ -235,9 +235,17 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
                         break;
                     case ("coordinates"):
                         List<String> coordinates = new ArrayList<>(Arrays.asList(filter.get(1).split(",")));
-                        Predicate x = criteriaBuilder.equal(from.get("coordinates").get("x"), Double.parseDouble(coordinates.get(0)));
-                        Predicate y = criteriaBuilder.equal(from.get("coordinates").get("y"), Double.parseDouble(coordinates.get(1)));
-                        predicates.add(criteriaBuilder.and(x, y));
+                        try {
+                            double double_x = Double.parseDouble(coordinates.get(0));
+                            double double_y = Double.parseDouble(coordinates.get(1));
+                            Predicate x = criteriaBuilder.equal(from.get("coordinates").get("x"), double_x);
+                            Predicate y = criteriaBuilder.equal(from.get("coordinates").get("y"), double_y);
+                            predicates.add(criteriaBuilder.and(x, y));
+                        }catch (NumberFormatException e){
+                            throw new BadRequestException("Bad format of coordinates. They both should be present and not be empty");
+                        }
+
+
                         break;
                     case ("creationDate"):
                         List<String> minutesFormat = new ArrayList<>(Arrays.asList(filter.get(2).split(",")));
