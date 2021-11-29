@@ -1,5 +1,6 @@
 package util;
 
+import exceptions.BadRequestException;
 import exceptions.NotFoundException;
 import models.Mood;
 import models.WeaponType;
@@ -12,7 +13,7 @@ public class FieldValidationUtil {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Cannot parse integer value from " + value);
+            throw new BadRequestException("Cannot parse integer value from " + value);
         }
     }
 
@@ -22,7 +23,7 @@ public class FieldValidationUtil {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Cannot parse double value from " + value);
+            throw new BadRequestException("Cannot parse double value from " + value);
         }
     }
 
@@ -32,7 +33,7 @@ public class FieldValidationUtil {
         try {
             return Float.parseFloat(value);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Cannot parse double value from " + value);
+            throw new BadRequestException("Cannot parse float value from " + value);
         }
     }
 
@@ -42,7 +43,7 @@ public class FieldValidationUtil {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Cannot parse double value from " + value);
+            throw new BadRequestException("Cannot parse long value from " + value);
         }
     }
 
@@ -52,7 +53,7 @@ public class FieldValidationUtil {
         try {
             return Boolean.parseBoolean(value);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Cannot parse boolean value from " + value);
+            throw new BadRequestException("Cannot parse boolean value from " + value);
         }
     }
 
@@ -68,7 +69,7 @@ public class FieldValidationUtil {
         try {
             return Mood.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Movie genre does not exist " + value);
+            throw new BadRequestException("Mood does not exist: " + value);
         }
     }
 
@@ -78,7 +79,7 @@ public class FieldValidationUtil {
         try {
             return WeaponType.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Mpaa rating does not exist " + value);
+            throw new BadRequestException("WeaponType does not exist: " + value);
         }
     }
 
