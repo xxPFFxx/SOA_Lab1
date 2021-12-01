@@ -45,11 +45,8 @@ public class CarServlet extends HttpServlet {
         if (id != null) {
             String finalId = id;
             Car car = (repository.findById(Integer.parseInt(id))).orElseThrow(() -> new NotFoundException("car with id = " + finalId + " does not exist"));
-            CarDTOList dto = new CarDTOList(new ArrayList<>());
-            List<CarDTO> dtoList = new ArrayList<>();
-            dtoList.add(carMapper.mapCarToCarDTO(car));
-            dto.setCarList(dtoList);
-            response.getWriter().write(gson.toJson(dto));
+            CarDTO carDTO = carMapper.mapCarToCarDTO(car);
+            response.getWriter().write(gson.toJson(carDTO));
             return;
         }
 
@@ -64,8 +61,8 @@ public class CarServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        CarDTOList carDTOList = gson.fromJson(requestBody, CarDTOList.class);
-        Car carToPersist = carMapper.mapCarDTOToCar(carDTOList.getCarList().get(0));
+        CarDTO carDTO = gson.fromJson(requestBody, CarDTO.class);
+        Car carToPersist = carMapper.mapCarDTOToCar(carDTO);
         entityValidator.validateCar(carToPersist);
         repository.save(carToPersist);
     }
@@ -73,8 +70,8 @@ public class CarServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        CarDTOList carDTOList = gson.fromJson(requestBody, CarDTOList.class);
-        Car carToUpdate = carMapper.mapCarDTOToCar(carDTOList.getCarList().get(0));
+        CarDTO carDTO = gson.fromJson(requestBody, CarDTO.class);
+        Car carToUpdate = carMapper.mapCarDTOToCar(carDTO);
         String pathInfo = request.getPathInfo();
         String id = null;
         if (pathInfo != null)

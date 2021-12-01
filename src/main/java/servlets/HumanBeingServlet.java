@@ -62,11 +62,8 @@ public class HumanBeingServlet extends HttpServlet {
                 int intId = Integer.parseInt(id);
                 if (intId <= 0) throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
                 HumanBeing humanBeing = (repository.findById(intId)).orElseThrow(() -> new NotFoundException("humanBeing with id = " + finalId + " does not exist"));
-                HumanBeingDTOList dto = new HumanBeingDTOList(new ArrayList<>(), 1);
-                List<HumanBeingDTO> dtoList = new ArrayList<>();
-                dtoList.add(humanBeingMapper.mapHumanBeingToHumanBeingDTO(humanBeing));
-                dto.setHumanBeingList(dtoList);
-                response.getWriter().write(gson.toJson(dto));
+                HumanBeingDTO humanBeingDTO = humanBeingMapper.mapHumanBeingToHumanBeingDTO(humanBeing);
+                response.getWriter().write(gson.toJson(humanBeingDTO));
                 return;
             }catch (NumberFormatException e){
                 throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
@@ -85,8 +82,8 @@ public class HumanBeingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cors(response);
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
-        HumanBeing humanBeingToPersist = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
+        HumanBeingDTO humanBeingDTO = gson.fromJson(requestBody, HumanBeingDTO.class);
+        HumanBeing humanBeingToPersist = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTO);
         entityValidator.validateHumanBeing(humanBeingToPersist);
         entityValidator.validateCoordinates(humanBeingToPersist.getCoordinates());
         entityValidator.validateCar(humanBeingToPersist.getCar());
@@ -98,8 +95,8 @@ public class HumanBeingServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cors(response);
         String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        HumanBeingDTOList humanBeingDTOList = gson.fromJson(requestBody, HumanBeingDTOList.class);
-        HumanBeing humanBeingToUpdate = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTOList.getHumanBeingList().get(0));
+        HumanBeingDTO humanBeingDTO = gson.fromJson(requestBody, HumanBeingDTO.class);
+        HumanBeing humanBeingToUpdate = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTO);
         entityValidator.validateHumanBeing(humanBeingToUpdate);
         entityValidator.validateCoordinates(humanBeingToUpdate.getCoordinates());
         entityValidator.validateCar(humanBeingToUpdate.getCar());
