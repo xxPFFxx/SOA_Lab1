@@ -106,8 +106,23 @@ public class HumanBeingServlet extends HttpServlet {
             id = pathInfo.substring(1);
 
         if (id != null) {
-            humanBeingToUpdate.setId(Long.parseLong(id));
-            repository.update(humanBeingToUpdate);
+            try {
+                long intId = Long.parseLong(id);
+                repository.findById((int) intId);
+                humanBeingToUpdate.setId(Long.parseLong(id));
+                repository.update(humanBeingToUpdate);
+                // Почему-то ошибки нормально в PUT не обрабатываются, пришлось так сделать
+            } catch (NumberFormatException e) {
+//                throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
+                response.setStatus(400);
+                System.out.println(response.getStatus());
+                response.getWriter().println("Bad format of id: " + id + ", should be natural number (1,2,...)");
+            } catch (NoResultException e) {
+//                throw new NotFoundException("No HumanBeing with id " + id);
+                response.setStatus(400);
+                System.out.println(response.getStatus());
+                response.getWriter().println("No HumanBeing with id " + id);
+            }
         }
     }
 
