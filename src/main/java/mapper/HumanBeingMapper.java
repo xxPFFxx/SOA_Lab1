@@ -1,6 +1,7 @@
 package mapper;
 
 import dto.HumanBeingDTO;
+import exceptions.BadRequestException;
 import models.Car;
 import models.Coordinates;
 import models.HumanBeing;
@@ -20,18 +21,23 @@ public class HumanBeingMapper {
     }
 
     public HumanBeing mapHumanBeingDTOToHumanBeing(HumanBeingDTO humanBeingDTO) {
-        HumanBeing humanBeing = new HumanBeing();
-        humanBeing.setId(FieldValidationUtil.getLongFieldValue(humanBeingDTO.getId()));
-        humanBeing.setName(FieldValidationUtil.getStringValue(humanBeingDTO.getName()));
-        humanBeing.setCoordinates(coordinatesMapper.mapCoordinatesDTOToCoordinates(humanBeingDTO.getCoordinates()));
-        humanBeing.setRealHero(FieldValidationUtil.getBooleanFieldValue(humanBeingDTO.getRealHero()));
-        humanBeing.setHasToothpick(FieldValidationUtil.getBooleanFieldValue(humanBeingDTO.getHasToothpick()));
-        humanBeing.setImpactSpeed(FieldValidationUtil.getFloatFieldValue(humanBeingDTO.getImpactSpeed()));
-        humanBeing.setSoundtrackName(FieldValidationUtil.getStringValue(humanBeingDTO.getSoundtrackName()));
-        humanBeing.setWeaponType(FieldValidationUtil.getWeaponTypeValue(humanBeingDTO.getWeaponType()));
-        humanBeing.setMood(FieldValidationUtil.getMoodValue(humanBeingDTO.getMood()));
-        humanBeing.setCar(carMapper.mapCarDTOToCar(humanBeingDTO.getCar()));
-        return humanBeing;
+        try {
+            HumanBeing humanBeing = new HumanBeing();
+            humanBeing.setId(FieldValidationUtil.getLongFieldValue(humanBeingDTO.getId()));
+            humanBeing.setName(FieldValidationUtil.getStringValue(humanBeingDTO.getName()));
+            humanBeing.setCoordinates(coordinatesMapper.mapCoordinatesDTOToCoordinates(humanBeingDTO.getCoordinates()));
+            humanBeing.setRealHero(FieldValidationUtil.getBooleanFieldValue(humanBeingDTO.getRealHero()));
+            humanBeing.setHasToothpick(FieldValidationUtil.getBooleanFieldValue(humanBeingDTO.getHasToothpick()));
+            humanBeing.setImpactSpeed(FieldValidationUtil.getFloatFieldValue(humanBeingDTO.getImpactSpeed()));
+            humanBeing.setSoundtrackName(FieldValidationUtil.getStringValue(humanBeingDTO.getSoundtrackName()));
+            humanBeing.setWeaponType(FieldValidationUtil.getWeaponTypeValue(humanBeingDTO.getWeaponType()));
+            humanBeing.setMood(FieldValidationUtil.getMoodValue(humanBeingDTO.getMood()));
+            humanBeing.setCar(carMapper.mapCarDTOToCar(humanBeingDTO.getCar()));
+            return humanBeing;
+        } catch (NullPointerException e) {
+            throw new BadRequestException("Bad format of JSON body");
+        }
+
     }
 
     public HumanBeingDTO mapHumanBeingToHumanBeingDTO(HumanBeing humanBeing) {

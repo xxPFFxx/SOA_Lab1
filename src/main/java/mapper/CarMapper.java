@@ -1,6 +1,7 @@
 package mapper;
 
 import dto.CarDTO;
+import exceptions.BadRequestException;
 import models.Car;
 import util.FieldValidationUtil;
 
@@ -9,11 +10,15 @@ import java.util.List;
 
 public class CarMapper {
     public Car mapCarDTOToCar(CarDTO carDTO) {
-        Car car = new Car();
-        car.setId(FieldValidationUtil.getLongFieldValue(carDTO.getId()));
-        car.setName(FieldValidationUtil.getStringValue(carDTO.getName()));
-        car.setCool(FieldValidationUtil.getBooleanFieldValue(carDTO.getCool()));
-        return car;
+        try {
+            Car car = new Car();
+            car.setId(FieldValidationUtil.getLongFieldValue(carDTO.getId()));
+            car.setName(FieldValidationUtil.getStringValue(carDTO.getName()));
+            car.setCool(FieldValidationUtil.getBooleanFieldValue(carDTO.getCool()));
+            return car;
+        }        catch (NullPointerException e) {
+            throw new BadRequestException("Bad format of JSON body");
+        }
     }
 
     public CarDTO mapCarToCarDTO(Car car) {

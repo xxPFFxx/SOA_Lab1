@@ -1,6 +1,7 @@
 package mapper;
 
 import dto.CoordinatesDTO;
+import exceptions.BadRequestException;
 import models.Coordinates;
 import util.FieldValidationUtil;
 
@@ -10,11 +11,16 @@ import java.util.List;
 public class CoordinatesMapper {
 
     public Coordinates mapCoordinatesDTOToCoordinates(CoordinatesDTO coordinatesDTO) {
-        Coordinates coordinates = new Coordinates();
-        coordinates.setId(FieldValidationUtil.getLongFieldValue(coordinatesDTO.getId()));
-        coordinates.setX(FieldValidationUtil.getIntegerFieldValue(coordinatesDTO.getX()));
-        coordinates.setY(FieldValidationUtil.getLongFieldValue(coordinatesDTO.getY()));
-        return coordinates;
+        try {
+            Coordinates coordinates = new Coordinates();
+            coordinates.setId(FieldValidationUtil.getLongFieldValue(coordinatesDTO.getId()));
+            coordinates.setX(FieldValidationUtil.getIntegerFieldValue(coordinatesDTO.getX()));
+            coordinates.setY(FieldValidationUtil.getLongFieldValue(coordinatesDTO.getY()));
+            return coordinates;
+        }
+        catch (NullPointerException e) {
+            throw new BadRequestException("Bad format of JSON body");
+        }
     }
 
     public CoordinatesDTO mapCoordinatesToCoordinatesDTO(Coordinates coordinates) {
