@@ -28,16 +28,18 @@ public class EntityValidator {
         return errorMessage;
     }
 
-    public void validateCar(Car car) throws NotFoundException {
+    public void validateCar(Car car){
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(car);
         if (!constraintViolations.isEmpty())
             throw new BadRequestException(formExceptionMsg(constraintViolations));
+
     }
 
     public void validateCoordinates(Coordinates coordinates) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(coordinates);
         if (!constraintViolations.isEmpty())
             throw new BadRequestException(formExceptionMsg(constraintViolations));
+
     }
 
     public void validateHumanBeing(HumanBeing humanBeing) {

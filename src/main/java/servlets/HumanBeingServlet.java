@@ -1,21 +1,8 @@
 package servlets;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import dto.HumanBeingDTO;
-import dto.PagedHumanBeingList;
-import dto.dtoList.HumanBeingDTOList;
-import exceptions.BadRequestException;
-import exceptions.NotFoundException;
-import mapper.HumanBeingMapper;
-import models.HumanBeing;
-import repository.implementation.CrudRepositoryImplementation;
 import services.HumanBeingService;
 import util.UrlParametersUtil;
-import validation.EntityValidator;
 
-import javax.persistence.NoResultException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -57,13 +44,13 @@ public class HumanBeingServlet extends HttpServlet {
             cors(response);
             String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             String pathInfo = request.getPathInfo();
-            humanBeingService.updateHumanBeing(requestBody, pathInfo);
+            humanBeingService.updateHumanBeing(requestBody, pathInfo, response);
     }
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cors(response);
         String pathInfo = request.getPathInfo();
-        humanBeingService.deleteHumanBeing(pathInfo);
+        humanBeingService.deleteHumanBeing(pathInfo, response);
     }
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

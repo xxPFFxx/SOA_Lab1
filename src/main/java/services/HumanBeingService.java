@@ -14,7 +14,6 @@ import repository.implementation.CrudRepositoryImplementation;
 import validation.EntityValidator;
 
 import javax.persistence.NoResultException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -32,7 +31,7 @@ public class HumanBeingService {
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    public void updateHumanBeing(String requestBody, String pathInfo) throws NotFoundException {
+    public void updateHumanBeing(String requestBody, String pathInfo, HttpServletResponse resp) throws IOException {
         try {
             HumanBeingDTO humanBeingDTO = gson.fromJson(requestBody, HumanBeingDTO.class);
             HumanBeing humanBeingToUpdate = humanBeingMapper.mapHumanBeingDTOToHumanBeing(humanBeingDTO);
@@ -52,13 +51,23 @@ public class HumanBeingService {
                     repository.update(humanBeingToUpdate);
                     // Почему-то ошибки нормально в PUT не обрабатываются, пришлось так сделать
                 } catch (NumberFormatException e) {
-                    throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
+//                    throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
+                    resp.setStatus(400);
+                    resp.getWriter().println("Bad format of id: " + id + ", should be natural number (1,2,...)");
                 } catch (NoResultException e) {
-                    throw new NotFoundException("No HumanBeing with id " + id);
+//                    throw new NotFoundException("No HumanBeing with id " + id);
+                    resp.setStatus(400);
+                    resp.getWriter().println("No HumanBeing with id " + id);
                 }
             }
-        }catch (JsonSyntaxException | NotFoundException e){
-            throw new NotFoundException("Bad syntax of JSON body");
+        }catch (JsonSyntaxException | NotFoundException | IOException e){
+//            throw new NotFoundException("Bad syntax of JSON body");
+            resp.setStatus(400);
+            resp.getWriter().println("Bad syntax of JSON body");
+        }
+        catch (BadRequestException e){
+            resp.setStatus(400);
+            resp.getWriter().println(e.getMessage());
         }
 
     }
@@ -76,7 +85,7 @@ public class HumanBeingService {
     }
     }
 
-    public void deleteHumanBeing(String pathInfo){
+    public void deleteHumanBeing(String pathInfo, HttpServletResponse resp) throws IOException {
         String humanBeingId = null;
         if (pathInfo != null)
             humanBeingId = pathInfo.substring(1);
@@ -86,9 +95,14 @@ public class HumanBeingService {
             repository.deleteById(Integer.parseInt(humanBeingId));
             //                  Почему-то ошибки нормально в DELETE не обрабатываются, пришлось так сделать
         } catch (NumberFormatException e) {
-                throw new BadRequestException("Bad format of id: " + humanBeingId + ", should be natural number (1,2,...)");
+//                throw new BadRequestException("Bad format of id: " + humanBeingId + ", should be natural number (1,2,...)");
+            resp.setStatus(400);
+            resp.getWriter().println("Bad format of id: " + humanBeingId + ", should be natural number (1,2,...)");
+
         } catch (NoResultException e) {
-                throw new NotFoundException("No HumanBeing with id " + humanBeingId);
+//                throw new NotFoundException("No HumanBeing with id " + humanBeingId);
+            resp.setStatus(404);
+            resp.getWriter().println("No HumanBeing with id " + humanBeingId);
         }
     }
 
