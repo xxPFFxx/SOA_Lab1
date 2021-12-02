@@ -16,6 +16,7 @@ import javax.persistence.criteria.*;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -221,71 +222,73 @@ public class CrudRepositoryImplementation<T> implements CrudRepository<T> {
     }
 
     private ArrayList<Predicate> getPredicatesList(String filterBy, CriteriaBuilder criteriaBuilder, Root<HumanBeing> from) {
-        ArrayList<Predicate> predicates = new ArrayList<>();
-        if (filterBy != null && !filterBy.isEmpty()) {
-            List<String> notParsedFilters = new ArrayList<>(Arrays.asList(filterBy.split(";")));
-            for (String filterString : notParsedFilters) {
-                List<String> filter = new ArrayList<>(Arrays.asList(filterString.split(":")));
-                switch (filter.get(0)) {
-                    case ("id"):
-                        predicates.add(criteriaBuilder.equal(from.get("id"), Integer.parseInt(filter.get(1))));
-                        break;
-                    case ("name"):
-                        predicates.add(criteriaBuilder.equal(from.get("name"), filter.get(1)));
-                        break;
-                    case ("coordinates"):
-                        List<String> coordinates = new ArrayList<>(Arrays.asList(filter.get(1).split(",")));
-                        try {
+        try {
+            ArrayList<Predicate> predicates = new ArrayList<>();
+            if (filterBy != null && !filterBy.isEmpty()) {
+                List<String> notParsedFilters = new ArrayList<>(Arrays.asList(filterBy.split(";")));
+                for (String filterString : notParsedFilters) {
+                    List<String> filter = new ArrayList<>(Arrays.asList(filterString.split(":")));
+                    switch (filter.get(0)) {
+                        case ("id"):
+                            predicates.add(criteriaBuilder.equal(from.get("id"), Integer.parseInt(filter.get(1))));
+                            break;
+                        case ("name"):
+                            predicates.add(criteriaBuilder.equal(from.get("name"), filter.get(1)));
+                            break;
+                        case ("coordinates"):
+                            List<String> coordinates = new ArrayList<>(Arrays.asList(filter.get(1).split(",")));
                             double double_x = Double.parseDouble(coordinates.get(0));
                             double double_y = Double.parseDouble(coordinates.get(1));
                             Predicate x = criteriaBuilder.equal(from.get("coordinates").get("x"), double_x);
                             Predicate y = criteriaBuilder.equal(from.get("coordinates").get("y"), double_y);
                             predicates.add(criteriaBuilder.and(x, y));
-                        }catch (NumberFormatException e){
-                            throw new BadRequestException("Bad format of coordinates. They both should be present and not be empty");
-                        }
+                            break;
+                        case ("creationDate"):
+                            List<String> minutesFormat = new ArrayList<>(Arrays.asList(filter.get(2).split(",")));
+                            List<String> dateParameters = new ArrayList<>();
+                            dateParameters.add((filter.get(1) + ":" + minutesFormat.get(0)).replace("T", " "));
+                            dateParameters.add(minutesFormat.get(1));
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                            if (dateParameters.get(1).equals("after")){
+                                predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
+                            }
+                            if (dateParameters.get(1).equals("before")){
+                                predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
+                            }
+                            break;
+                        case ("realHero"):
+                            predicates.add(criteriaBuilder.equal(from.get("realHero"), Boolean.parseBoolean(filter.get(1))));
+                            break;
+                        case ("hasToothpick"):
+                            predicates.add(criteriaBuilder.equal(from.get("hasToothpick"), Boolean.parseBoolean(filter.get(1))));
+                            break;
+                        case ("impactSpeed"):
+                            predicates.add(criteriaBuilder.equal(from.get("impactSpeed"), Float.parseFloat(filter.get(1))));
+                            break;
+                        case ("weaponType"):
+                            predicates.add(criteriaBuilder.equal(from.get("weaponType"), WeaponType.valueOf(filter.get(1))));
+                            break;
+                        case ("mood"):
+                            predicates.add(criteriaBuilder.equal(from.get("mood"), Mood.valueOf(filter.get(1))));
+                            break;
+                        case ("soundtrackName"):
+                            predicates.add(criteriaBuilder.equal(from.get("soundtrackName"), filter.get(1)));
+                            break;
+                        case ("car"):
+                            predicates.add(criteriaBuilder.equal(from.get("car").get("name"), filter.get(1)));
+                            break;
+                        default:
+                            throw new BadRequestException("Bad format of filter: no such field " + filter.get(0));
+                    }
 
-
-                        break;
-                    case ("creationDate"):
-                        List<String> minutesFormat = new ArrayList<>(Arrays.asList(filter.get(2).split(",")));
-                        List<String> dateParameters = new ArrayList<>();
-                        dateParameters.add((filter.get(1) + ":" + minutesFormat.get(0)).replace("T", " "));
-                        dateParameters.add(minutesFormat.get(1));
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        if (dateParameters.get(1).equals("after")){
-                            predicates.add(criteriaBuilder.greaterThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
-                        }
-                        if (dateParameters.get(1).equals("before")){
-                            predicates.add(criteriaBuilder.lessThanOrEqualTo(from.get("creationDate"), LocalDateTime.parse(dateParameters.get(0), formatter)));
-                        }
-                        break;
-                    case ("realHero"):
-                        predicates.add(criteriaBuilder.equal(from.get("realHero"), Boolean.parseBoolean(filter.get(1))));
-                        break;
-                    case ("hasToothpick"):
-                        predicates.add(criteriaBuilder.equal(from.get("hasToothpick"), Boolean.parseBoolean(filter.get(1))));
-                        break;
-                    case ("impactSpeed"):
-                        predicates.add(criteriaBuilder.equal(from.get("impactSpeed"), Float.parseFloat(filter.get(1))));
-                        break;
-                    case ("weaponType"):
-                        predicates.add(criteriaBuilder.equal(from.get("weaponType"), WeaponType.valueOf(filter.get(1))));
-                        break;
-                    case ("mood"):
-                        predicates.add(criteriaBuilder.equal(from.get("mood"), Mood.valueOf(filter.get(1))));
-                        break;
-                    case ("soundtrackName"):
-                        predicates.add(criteriaBuilder.equal(from.get("soundtrackName"), filter.get(1)));
-                        break;
-                    case ("car"):
-                        predicates.add(criteriaBuilder.equal(from.get("car").get("name"), filter.get(1)));
-                        break;
                 }
             }
+
+            return predicates;
+        } catch (IndexOutOfBoundsException | IllegalArgumentException | DateTimeParseException e){
+            throw new BadRequestException("Bad format of filter");
         }
 
-        return predicates;
     }
 
     @Override
