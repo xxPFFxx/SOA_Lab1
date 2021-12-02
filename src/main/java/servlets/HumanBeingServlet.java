@@ -9,7 +9,6 @@ import exceptions.BadRequestException;
 import exceptions.NotFoundException;
 import mapper.HumanBeingMapper;
 import models.HumanBeing;
-import net.bytebuddy.implementation.bytecode.Throw;
 import repository.implementation.CrudRepositoryImplementation;
 import util.UrlParametersUtil;
 import validation.EntityValidator;
@@ -20,12 +19,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @WebServlet("/human-beings/*")
@@ -125,7 +119,6 @@ public class HumanBeingServlet extends HttpServlet {
             }
         }
     }
-
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cors(response);
@@ -134,8 +127,21 @@ public class HumanBeingServlet extends HttpServlet {
         if (pathInfo != null)
             humanBeingId = pathInfo.substring(1);
         String finalHumanBeingId = humanBeingId;
-        HumanBeing humanBeing = (repository.findById(Integer.parseInt(humanBeingId))).orElseThrow(() -> new NotFoundException("humanBeing with id = " + finalHumanBeingId + " does not exist"));
-        repository.deleteById(Integer.parseInt(humanBeingId));
+        try {
+            HumanBeing humanBeing = (repository.findById(Integer.parseInt(humanBeingId))).orElseThrow(() -> new NotFoundException("humanBeing with id = " + finalHumanBeingId + " does not exist"));
+            repository.deleteById(Integer.parseInt(humanBeingId));
+        //                  Почему-то ошибки нормально в DELETE не обрабатываются, пришлось так сделать
+        } catch (NumberFormatException e) {
+//                throw new BadRequestException("Bad format of id: " + id + ", should be natural number (1,2,...)");
+            response.setStatus(400);
+            System.out.println(response.getStatus());
+            response.getWriter().println("Bad format of id: " + humanBeingId + ", should be natural number (1,2,...)");
+        } catch (NoResultException e) {
+//                throw new NotFoundException("No HumanBeing with id " + id);
+            response.setStatus(400);
+            System.out.println(response.getStatus());
+            response.getWriter().println("No HumanBeing with id " + humanBeingId);
+        }
 
     }
     @Override
