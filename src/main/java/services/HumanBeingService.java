@@ -16,6 +16,7 @@ import validation.EntityValidator;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 public class HumanBeingService {
 
@@ -46,7 +47,8 @@ public class HumanBeingService {
             if (id != null) {
                 try {
                     long intId = Long.parseLong(id);
-                    repository.findById((int) intId);
+                    Optional<HumanBeing> humanBeing = repository.findById((int) intId);
+                    humanBeingToUpdate.setCreationDate(humanBeing.get().getCreationDate());
                     humanBeingToUpdate.setId(Long.parseLong(id));
                     repository.update(humanBeingToUpdate);
                     // Почему-то ошибки нормально в PUT не обрабатываются, пришлось так сделать
